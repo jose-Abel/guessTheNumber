@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect } from 'react';
-import {View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
+import {View, Text, StyleSheet, Alert, ScrollView, FlatList } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import NumberContainer from '../components/NumberContainer';
 import Card from '../components/Card';
@@ -18,10 +18,10 @@ const generateRandomBetween = (min, max, exclude) => {
   }
 }
 
-const renderListItem = (value, numOfRound) => (
-  <View key={value} style={styles.listItem}>
-    <BodyText>#{numOfRound}</BodyText>
-    <BodyText>{value}</BodyText>
+const renderListItem = (listLength, itemData) => (
+  <View style={styles.listItem}>
+    <BodyText>#{listLength - itemData.index}</BodyText>
+    <BodyText>{itemData.item}</BodyText>
   </View> 
 )
 
@@ -31,7 +31,7 @@ const GameScreen = props => {
 
   const [currentGuess, setCurrentGuess] = useState(initialGuess);
 
-  const [pastGuesses, setPastGuesses] = useState([initialGuess]);
+  const [pastGuesses, setPastGuesses] = useState([initialGuess.toString()]);
 
   const currentLow = useRef(1);
   const currentHigh = useRef(100);
@@ -62,7 +62,7 @@ const GameScreen = props => {
     const nextNumber = generateRandomBetween(currentLow.current, currentHigh.current, currentGuess);
 
     setCurrentGuess(nextNumber);
-    setPastGuesses(curPastGuesses => [nextNumber,...curPastGuesses]);
+    setPastGuesses(curPastGuesses => [nextNumber.toString(),...curPastGuesses]);
   }
 
   return (
@@ -86,9 +86,16 @@ const GameScreen = props => {
       </Card>
 
       <View style={styles.listContainer}>
-        <ScrollView contentContainerStyle={styles.list}>
+        <FlatList 
+          keyExtractor={item => item}
+          data={pastGuesses}
+          renderItem={renderListItem.bind(this, pastGuesses.length)}
+          contentContainerStyle={styles.list}
+        />
+        {/*<ScrollView contentContainerStyle={styles.list}>
           {pastGuesses.map((guess, index) => renderListItem(guess, pastGuesses.length - index))}
-        </ScrollView>
+        </ScrollView>*/}
+        
       </View>
     </View>
   )
@@ -112,11 +119,11 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    width: '80%'
+    width: '60%'
   },
   list: {
     flexGrow: 1,
-    alignItems: 'center',
+    // alignItems: 'center',
     justifyContent: 'flex-end'
   },
   listItem: {
@@ -127,7 +134,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '60%'
+    width: '100%'
   }
 });
 
