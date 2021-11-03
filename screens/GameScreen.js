@@ -33,10 +33,25 @@ const GameScreen = props => {
 
   const [pastGuesses, setPastGuesses] = useState([initialGuess.toString()]);
 
+  const [availableDeviceWidth, setAvailableDeviceWidth] = useState(Dimensions.get('window').width);
+
+  const [availableDeviceHeight, setAvailableDeviceHeight] = useState(Dimensions.get('window').height);
+
   const currentLow = useRef(1);
   const currentHigh = useRef(100);
 
   const { userChoice, onGameOver } = props;
+
+  useEffect(() => {
+    const updateLayout = () => {
+      setAvailableDeviceWidth(Dimensions.get('window').width);
+
+      setAvailableDeviceHeight(Dimensions.get('window').height);
+    }
+    const subscription = Dimensions.addEventListener('change', updateLayout);
+
+    return () => subscription?.remove();
+  });
 
   useEffect(() => {
     if (currentGuess === userChoice) {
@@ -65,6 +80,46 @@ const GameScreen = props => {
     setPastGuesses(curPastGuesses => [nextNumber.toString(),...curPastGuesses]);
   }
 
+  let listContainerStyle = styles.listContainer;
+
+  if (availableDeviceWidth < 350) {
+    listContainerStyle = styles.listContainerBig;
+  }
+
+  if (availableDeviceHeight < 500) {
+    return (
+      <View style={styles.screen}>
+        <Text>Opponent's Guess</Text>
+
+        <View style={styles.controls} >
+          <MainButton
+            style={styles.button}
+            onPress={() => nextGuessHandler('greater')}
+            >
+            <Ionicons name="md-add" size={24} color="white"/>
+          </MainButton>
+
+          <NumberContainer>{currentGuess}</NumberContainer>
+
+          <MainButton
+            style={styles.button}
+            onPress={() =>  nextGuessHandler('lower')}>
+            <Ionicons name="md-remove" size={24} color="white"/>
+          </MainButton>
+        </View>
+    
+        <View style={styles.listContainerStyle}>
+          <FlatList 
+            keyExtractor={item => item}
+            data={pastGuesses}
+            renderItem={renderListItem.bind(this, pastGuesses.length)}
+            contentContainerStyle={styles.list}
+          />
+        </View>
+      </View>
+    )
+  } 
+
   return (
     <View style={styles.screen}>
       <Text>Opponent's Guess</Text>
@@ -85,7 +140,7 @@ const GameScreen = props => {
         </MainButton>
       </Card>
 
-      <View style={styles.listContainer}>
+      <View style={styles.listContainerStyle}>
         <FlatList 
           keyExtractor={item => item}
           data={pastGuesses}
@@ -117,9 +172,19 @@ const styles = StyleSheet.create({
   button: {
     paddingHorizontal: 15
   },
+  controls: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    width: '80%',
+  },
   listContainer: {
     flex: 1,
-    width: Dimensions.get('window').width > 350 ? '60%' : '80%'
+    width: '60%'
+  },
+  listContainerBig: {
+    flex: 1,
+    width: '80%'
   },
   list: {
     flexGrow: 1,
