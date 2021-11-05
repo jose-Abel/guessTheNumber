@@ -2,7 +2,8 @@
 
 Guess the Number mobile app build with React Native and expo tool.
 
-<!-- ![screenshot]() -->
+![screenshot](./app_screenshot.png)
+![screenshot](./app_screenshot2.png)
 
 ## Built With
 
@@ -11,8 +12,6 @@ Guess the Number mobile app build with React Native and expo tool.
 - react-dom
 - react-native
 - react-native-web
-
-## React Native Components
 
 ## Getting Started
 
@@ -32,8 +31,9 @@ That's all, you are ready to go!
 
 Run the following command to have all npm packages dependencies installed:
 
-```
-    npm install
+```yarn install
+
+    expo install
 ```
 
 ### Usage
